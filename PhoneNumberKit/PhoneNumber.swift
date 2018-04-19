@@ -18,32 +18,36 @@ Parsed phone number object
 - numberExtension: Extension if available. String. Optional
 - type: Computed phone number type on access. Returns from an enumeration - PNPhoneNumberType.
 */
-public struct PhoneNumber {
-    public let numberString: String
-    public let countryCode: UInt64
-    public let leadingZero: Bool
-    public let nationalNumber: UInt64
-    public let numberExtension: String?
-    public let type: PhoneNumberType
-}
-
-extension PhoneNumber : Equatable {
-
-    public static func ==(lhs: PhoneNumber, rhs: PhoneNumber) -> Bool {
-        return (lhs.countryCode == rhs.countryCode)
-            && (lhs.leadingZero == rhs.leadingZero)
-            && (lhs.nationalNumber == rhs.nationalNumber)
-            && (lhs.numberExtension == rhs.numberExtension)
+@objc(PhoneNumber)
+public class PhoneNumber : NSObject {
+    @objc public let numberString: String
+    @objc public let countryCode: UInt64
+    @objc public let leadingZero: Bool
+    @objc public let nationalNumber: UInt64
+    @objc public let numberExtension: String?
+    @objc public let type: PhoneNumberType
+    
+    init(numberString: String, countryCode: UInt64, leadingZero: Bool, nationalNumber: UInt64, numberExtension: String?, type: PhoneNumberType) {
+        self.numberString = numberString
+        self.countryCode = countryCode
+        self.leadingZero = leadingZero
+        self.nationalNumber = nationalNumber
+        self.numberExtension = numberExtension
+        self.type = type
     }
-
-}
-
-extension PhoneNumber : Hashable {
-
-    public var hashValue: Int {
+    
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let rhs = object as? PhoneNumber else { return false }
+        
+        return (self.countryCode == rhs.countryCode)
+            && (self.leadingZero == rhs.leadingZero)
+            && (self.nationalNumber == rhs.nationalNumber)
+            && (self.numberExtension == rhs.numberExtension)
+    }
+    
+    override public var hash : Int {
         return countryCode.hashValue ^ nationalNumber.hashValue ^ leadingZero.hashValue ^ (numberExtension?.hashValue ?? 0)
     }
-
 }
 
 extension PhoneNumber{
@@ -65,7 +69,7 @@ public extension PhoneNumber {
     - Parameter rawNumber: String to be parsed to phone number struct.
     */
     @available(*, unavailable, message: "use PhoneNumberKit instead to produce PhoneNumbers")
-    public init(rawNumber: String) throws {
+    public convenience init(rawNumber: String) throws {
         assertionFailure(PhoneNumberError.deprecated.localizedDescription)
         throw PhoneNumberError.deprecated
     }
@@ -77,7 +81,7 @@ public extension PhoneNumber {
     - Parameter region: ISO 639 compliant region code.
     */
     @available(*, unavailable, message: "use PhoneNumberKit instead to produce PhoneNumbers")
-    public init(rawNumber: String, region: String) throws {
+    public convenience init(rawNumber: String, region: String) throws {
         throw PhoneNumberError.deprecated
     }
 

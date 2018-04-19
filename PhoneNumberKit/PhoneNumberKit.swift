@@ -10,7 +10,8 @@ import Foundation
 #if os(iOS)
 import CoreTelephony
 #endif
-    
+
+@objc(PhoneNumberKit)
 public final class PhoneNumberKit: NSObject {
     
     // Manager objects
@@ -33,7 +34,7 @@ public final class PhoneNumberKit: NSObject {
     ///   - region: ISO 639 compliant region code.
     ///   - ignoreType: Avoids number type checking for faster performance.
     /// - Returns: PhoneNumber object.
-    public func parse(_ numberString: String, withRegion region: String = PhoneNumberKit.defaultRegionCode(), ignoreType: Bool = false) throws -> PhoneNumber {
+    @objc public func parse(_ numberString: String, withRegion region: String = PhoneNumberKit.defaultRegionCode(), ignoreType: Bool = false) throws -> PhoneNumber {
 
         var numberStringWithPlus = numberString
 
@@ -55,7 +56,7 @@ public final class PhoneNumberKit: NSObject {
     /// - parameter ignoreType:   Avoids number type checking for faster performance.
     ///
     /// - returns: array of PhoneNumber objects.
-    public func parse(_ numberStrings: [String], withRegion region: String = PhoneNumberKit.defaultRegionCode(), ignoreType: Bool = false, shouldReturnFailedEmptyNumbers: Bool = false) -> [PhoneNumber] {
+    @objc public func parse(_ numberStrings: [String], withRegion region: String = PhoneNumberKit.defaultRegionCode(), ignoreType: Bool = false, shouldReturnFailedEmptyNumbers: Bool = false) -> [PhoneNumber] {
         return parseManager.parseMultiple(numberStrings, withRegion: region, ignoreType: ignoreType, shouldReturnFailedEmptyNumbers: shouldReturnFailedEmptyNumbers)
     }
     
@@ -68,7 +69,7 @@ public final class PhoneNumberKit: NSObject {
     /// - parameter prefix:      whether or not to include the prefix.
     ///
     /// - returns: Formatted representation of the PhoneNumber.
-    public func format(_ phoneNumber: PhoneNumber, toType formatType:PhoneNumberFormat, withPrefix prefix: Bool = true) -> String {
+    @objc public func format(_ phoneNumber: PhoneNumber, toType formatType:PhoneNumberFormat, withPrefix prefix: Bool = true) -> String {
         if formatType == .e164 {
             let formattedNationalNumber = phoneNumber.adjustedNationalNumber()
             if prefix == false {
@@ -92,7 +93,7 @@ public final class PhoneNumberKit: NSObject {
     /// Get a list of all the countries in the metadata database
     ///
     /// - returns: An array of ISO 639 compliant region codes.
-    public func allCountries() -> [String] {
+    @objc public func allCountries() -> [String] {
         let results = metadataManager.territories.map{$0.codeID}
         return results
     }
@@ -102,7 +103,7 @@ public final class PhoneNumberKit: NSObject {
     /// - parameter countryCode: international country code (e.g 44 for the UK).
     ///
     /// - returns: optional array of ISO 639 compliant region codes.
-    public func countries(withCode countryCode: UInt64) -> [String]? {
+    @objc public func countries(withCode countryCode: UInt64) -> [String]? {
         let results = metadataManager.filterTerritories(byCode: countryCode)?.map{$0.codeID}
         return results
     }
@@ -112,7 +113,7 @@ public final class PhoneNumberKit: NSObject {
     /// - parameter countryCode: international country code (e.g 1 for the US).
     ///
     /// - returns: ISO 639 compliant region code string.
-    public func mainCountry(forCode countryCode: UInt64) -> String? {
+    @objc public func mainCountry(forCode countryCode: UInt64) -> String? {
         let country = metadataManager.mainTerritory(forCode: countryCode)
         return country?.codeID
     }
@@ -127,12 +128,17 @@ public final class PhoneNumberKit: NSObject {
         return results
     }
     
+    public func countryCodeAsNSNumber(for country: String) -> NSNumber? {
+        let results = metadataManager.filterTerritories(byCountry: country)?.countryCode
+        return results as NSNumber?
+    }
+    
     /// Get leading digits for an ISO 639 compliant region code.
     ///
     /// - parameter country: ISO 639 compliant region code.
     ///
     /// - returns: leading digits (e.g. 876 for Jamaica).
-    public func leadingDigits(for country: String) -> String? {
+    @objc public func leadingDigits(for country: String) -> String? {
         let leadingDigits = metadataManager.filterTerritories(byCountry: country)?.leadingDigits
         return leadingDigits
     }
@@ -142,7 +148,7 @@ public final class PhoneNumberKit: NSObject {
     /// - parameter phoneNumber: PhoneNumber object
     ///
     /// - returns: Region code, eg "US", or nil if the region cannot be determined.
-    public func getRegionCode(of phoneNumber: PhoneNumber) -> String? {
+    @objc public func getRegionCode(of phoneNumber: PhoneNumber) -> String? {
         return parseManager.getRegionCode(of: phoneNumber.nationalNumber, countryCode: phoneNumber.countryCode, leadingZero: phoneNumber.leadingZero)
     }
     
@@ -151,7 +157,7 @@ public final class PhoneNumberKit: NSObject {
     /// Get a user's default region code
     ///
     /// - returns: A computed value for the user's current region - based on the iPhone's carrier and if not available, the device region.
-    public class func defaultRegionCode() -> String {
+    @objc public class func defaultRegionCode() -> String {
 #if os(iOS)
         let networkInfo = CTTelephonyNetworkInfo()
         let carrier = networkInfo.subscriberCellularProvider

@@ -54,10 +54,11 @@ extension PhoneNumberError: LocalizedError {
 
 }
 
-public enum PhoneNumberFormat {
-    case e164 // +33689123456
-    case international // +33 6 89 12 34 56
-    case national // 06 89 12 34 56
+@objc(PhoneNumberFormat)
+public enum PhoneNumberFormat: Int {
+    @objc(e164) case e164 // +33689123456
+    @objc(international) case international // +33 6 89 12 34 56
+    @objc(national) case national // 06 89 12 34 56
 }
 
 
@@ -76,7 +77,8 @@ public enum PhoneNumberFormat {
  - uan: UAN numbers
  - unknown: Unknown number type
  */
-public enum PhoneNumberType {
+@objc(PhoneNumberType)
+public enum PhoneNumberType: Int {
     case fixedLine
     case mobile
     case fixedOrMobile
